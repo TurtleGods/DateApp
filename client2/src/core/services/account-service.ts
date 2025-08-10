@@ -51,7 +51,7 @@ export class AccountService {
         },
         error: () => this.logout()
       });
-    }, 5 * 60 * 1000);//300 seconds
+    }, 60 * 60 * 1000);//1 hours
   }
 
   setCurrentUser(user: User) {
