@@ -45,4 +45,3 @@ msbuild.wrn
 appsettings.json
 appsettings.Development.json
 dating.db*
-/wwwroot/
