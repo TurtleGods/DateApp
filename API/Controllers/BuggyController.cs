@@ -19,7 +19,7 @@ namespace API.Controllers
         [HttpGet("not-found")]
         public ActionResult<AppUser> GetNotFound()
         {
-            var thing = context.Users.Find(-1);
+            var thing = context.Users.Find("0");
             if (thing == null) return NotFound();
             return thing;
         }

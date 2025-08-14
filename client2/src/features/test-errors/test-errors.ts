@@ -27,7 +27,7 @@ export class TestErrors {
   }
 
   get404Error() {
-    this.http.get(this.baseUrl + 'buggy/not-fount').subscribe({
+    this.http.get(this.baseUrl + 'buggy/not-found').subscribe({
       next: (response) => console.log(response),
       error: (error) => console.error(error),
     });
