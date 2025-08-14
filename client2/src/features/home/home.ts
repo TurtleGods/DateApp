@@ -16,4 +16,8 @@ export class Home {
   showRegister(value:boolean){
     this.registerMode.set(value);
   }
+
+  LearnMore(){
+    console.log("this is learn more")
+  }
 }
