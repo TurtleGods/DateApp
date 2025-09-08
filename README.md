@@ -15,6 +15,7 @@ To get the following information, which in {} you need to replace to your versio
   },
 ```
 <br/>
+
 To local develop, add a file appsettings.Development.json. To add your local connection.
 ```
 {
@@ -30,6 +31,7 @@ To local develop, add a file appsettings.Development.json. To add your local con
     "TokenKey":"super secret key super secret key super secret key super secret key "
 }
 ```
+
 you will need to install Cert with [mkcert](https://github.com/FiloSottile/mkcert)<br/>
 # Problem
 I have encounter net::ERR_CERT_AUTHORITY_INVALID in ASP.NET Core with my windows machine.<br/>
