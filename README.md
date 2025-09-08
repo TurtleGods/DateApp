@@ -14,3 +14,29 @@ To get the following information, which in {} you need to replace to your versio
     "ApiSecret":"{APISECRET}"
   },
 ```
+<br/>
+To local develop, add a file appsettings.Development.json. To add your local connection.
+```
+{
+    "Logging": {
+        "LogLevel": {
+            "Default": "Information",
+            "Microsoft.AspNetCore": "Warning"
+        }
+    },
+    "ConnectionStrings": {
+        "DefaultConnection": "Server=localhost,1433;Database=datingdb;User Id=SA;Password=Password@1;TrustServerCertificate=true;"
+    },
+    "TokenKey":"super secret key super secret key super secret key super secret key "
+}
+```
+you will need to install Cert with [mkcert](https://github.com/FiloSottile/mkcert)<br/>
+# Problem
+I have encounter net::ERR_CERT_AUTHORITY_INVALID in ASP.NET Core with my windows machine.<br/>
+I find a Solution [here](https://stackoverflow.com/questions/63796566/neterr-cert-authority-invalid-in-asp-net-core).<br/>
+
+```
+dotnet dev-certs https --clean
+dotnet dev-certs https --trust
+```
+Hope this can help you.
