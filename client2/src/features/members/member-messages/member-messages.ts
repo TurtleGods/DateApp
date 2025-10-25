@@ -1,7 +1,6 @@
 import { Component, effect, ElementRef, inject, model, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { MemberService } from '../../../core/services/member-service';
 import { MessageService } from '../../../core/services/message-service';
-import { Message } from '../../../types/message';
 import { DatePipe } from '@angular/common';
 import { TimeAgoPipe } from '../../../core/pipes/time-ago-pipe';
 import { FormsModule } from '@angular/forms';
@@ -48,9 +47,22 @@ export class MemberMessages implements OnInit, OnDestroy {
   sendMessage() {
     const recipientId = this.memberService.member()?.id;
     if (!recipientId||!this.messageContent()) return;
+    else  if(this.memberService.member()?.displayName==='OpenAI'){
+      this.messageService.sendOpenAIMessage(this.messageContent())?.subscribe((message) => {
+        // Simulate hub "NewMessage"
+        message.currentUserSender = message.senderId !== 'OpenAI';
+        this.messageService.messageThread.update(messages => [...messages, message]);
+
+        // Clear input
+        this.messageContent.set('');
+      });
+    }
+    else{
     this.messageService.sendMessage(recipientId, this.messageContent())?.then(()=>{
       this.messageContent.set('');
     })
+    }
+
   }
 
   scrollToBottom() {

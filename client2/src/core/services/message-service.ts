@@ -11,6 +11,7 @@ import { AccountService } from './account-service';
 })
 export class MessageService {
   private baseUrl = environment.apiUrl;
+  private langchainApiUrl = environment.langchainApiUrl;
   private hubUrl = environment.hubUrl;
   private http = inject(HttpClient);
   private accountService = inject(AccountService);
@@ -69,5 +70,8 @@ export class MessageService {
 
   deleteMessage(id: string) {
     return this.http.delete(this.baseUrl + 'messages/' + id);
+  }
+  sendOpenAIMessage(question: string) {
+    return this.http.post<Message>(this.langchainApiUrl + 'ask', { question: question });
   }
 }

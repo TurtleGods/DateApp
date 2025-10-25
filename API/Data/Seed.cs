@@ -76,7 +76,25 @@ public class Seed
 
         await userManager.CreateAsync(admin, "Pa$$w0rd");
         await userManager.AddToRolesAsync(admin, ["Admin", "Moderator"]);
+        
+        var openAI = new AppUser
+        {
+            DisplayName = "openai",
+            Email = "openAI@test.com",
+            UserName = "openAI@test.com",
+            Member = new Member
+            {
+                DisplayName = "OpenAI",
+                Gender = "Other",
+                City = "San Francisco",
+                Country = "USA",
+                DateOfBirth = new DateOnly(1990, 1, 1)
+            }
+        };
 
+
+        await userManager.CreateAsync(openAI, "Pa$$w0rd");
+        await userManager.AddToRolesAsync(openAI, ["Moderator"]);
 
     }
 }
