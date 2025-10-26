@@ -6,6 +6,7 @@ import { TimeAgoPipe } from '../../../core/pipes/time-ago-pipe';
 import { FormsModule } from '@angular/forms';
 import { PresenceService } from '../../../core/services/presence-service';
 import { ActivatedRoute } from '@angular/router';
+import { AccountService } from '../../../core/services/account-service';
 
 @Component({
   selector: 'app-member-messages',
@@ -57,10 +58,8 @@ export class MemberMessages implements OnInit, OnDestroy {
       // 2️⃣ 再請 Python 回答
       this.messageService.sendOpenAIMessage(content)?.subscribe((message) => {
         // AI 回覆直接 append 到訊息串
-        message.currentUserSender = message.senderId !== "openai-id";
-        this.messageService.messageThread.update(messages => [...messages, message]);
-        // 清空輸入
-        this.messageContent.set('');
+      this.messageService.messageThread.update(messages => [...messages, message]);
+      this.messageContent.set('');
       });
     }
     else{
