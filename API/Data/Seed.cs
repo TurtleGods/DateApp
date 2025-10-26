@@ -1,6 +1,3 @@
-using System;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using API.DTOs;
 using API.Entities;
@@ -79,11 +76,13 @@ public class Seed
         
         var openAI = new AppUser
         {
+            Id="openai-id",
             DisplayName = "openai",
             Email = "openAI@test.com",
             UserName = "openAI@test.com",
             Member = new Member
             {
+                Id = "openai-id",
                 DisplayName = "OpenAI",
                 Gender = "Other",
                 City = "San Francisco",

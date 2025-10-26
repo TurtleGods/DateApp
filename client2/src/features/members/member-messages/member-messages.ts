@@ -47,13 +47,19 @@ export class MemberMessages implements OnInit, OnDestroy {
   sendMessage() {
     const recipientId = this.memberService.member()?.id;
     if (!recipientId||!this.messageContent()) return;
-    else  if(this.memberService.member()?.displayName==='OpenAI'){
-      this.messageService.sendOpenAIMessage(this.messageContent())?.subscribe((message) => {
-        // Simulate hub "NewMessage"
-        message.currentUserSender = message.senderId !== 'OpenAI';
-        this.messageService.messageThread.update(messages => [...messages, message]);
+    else if(this.memberService.member()?.displayName==='OpenAI'){
+      const content = this.messageContent();
+      // 1️⃣ 使用者訊息先送到 Hub（保持一致）
+      if (recipientId) {
+        this.messageService.sendMessage(recipientId, content);
+      }
 
-        // Clear input
+      // 2️⃣ 再請 Python 回答
+      this.messageService.sendOpenAIMessage(content)?.subscribe((message) => {
+        // AI 回覆直接 append 到訊息串
+        message.currentUserSender = message.senderId !== "openai-id";
+        this.messageService.messageThread.update(messages => [...messages, message]);
+        // 清空輸入
         this.messageContent.set('');
       });
     }
