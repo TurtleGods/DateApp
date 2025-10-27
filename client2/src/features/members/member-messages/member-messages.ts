@@ -48,7 +48,7 @@ export class MemberMessages implements OnInit, OnDestroy {
   sendMessage() {
     const recipientId = this.memberService.member()?.id;
     if (!recipientId||!this.messageContent()) return;
-    else if(this.memberService.member()?.displayName==='OpenAI'){
+    else if(this.memberService.member()?.id==='openai-id'){
       const content = this.messageContent();
       // 1️⃣ 使用者訊息先送到 Hub（保持一致）
       if (recipientId) {
