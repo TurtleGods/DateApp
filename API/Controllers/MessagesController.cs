@@ -15,7 +15,6 @@ public class MessagesController(IUnitOfWork uow) : BaseApiController
     {
         var sender = await uow.MemberRepository.GetMemberByIdAsync(User.GetMemberId());
         var recipient = await uow.MemberRepository.GetMemberByIdAsync(createMessageDto.RecipientId);
-        var userDisplayName = recipient!.DisplayName;
         if (recipient == null || sender == null || sender.Id == createMessageDto.RecipientId)
         {
             return BadRequest("Cannot send this message");
