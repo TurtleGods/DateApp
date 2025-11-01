@@ -13,7 +13,15 @@
         {{message.senderDisplayName}}
         <time class="text-xs opacity-50">{{message.messageSent|date:'short'}}</time>
       </div>
-      <div class="chat-bubble">{{message.content}}</div>
+      @if(memberService.member()?.id==='openai-id'){
+        <div class="chat-container">
+          <div class="chat-bubble">
+            <div [innerHTML]="renderMarkdown(message.content)"></div>
+          </div>
+        </div>
+      }@else {
+        <div class="chat-bubble">{{message.content}}</div>
+      }
       @if(message.currentUserSender&&message.dateRead){
       <div class="chat-footer opacity-50">Seen {{message.dateRead|timeAgo}}</div>
       }@else if (message.currentUserSender&& !message.dateRead){

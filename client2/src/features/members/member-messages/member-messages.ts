@@ -7,6 +7,8 @@ import { FormsModule } from '@angular/forms';
 import { PresenceService } from '../../../core/services/presence-service';
 import { ActivatedRoute } from '@angular/router';
 import { AccountService } from '../../../core/services/account-service';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { marked } from 'marked';
 
 @Component({
   selector: 'app-member-messages',
@@ -17,11 +19,11 @@ import { AccountService } from '../../../core/services/account-service';
 export class MemberMessages implements OnInit, OnDestroy {
   @ViewChild('messageEndRef') messageEndRef!: ElementRef
   protected messageService = inject(MessageService);
-  private memberService = inject(MemberService);
+  protected memberService = inject(MemberService);
   protected presenceService = inject(PresenceService);
   private router = inject(ActivatedRoute);
   protected messageContent = model('');
-
+  private sanitizer = inject(DomSanitizer);
   constructor() {
     effect(() => {
       const currentMessage = this.messageService.messageThread();
@@ -55,12 +57,11 @@ export class MemberMessages implements OnInit, OnDestroy {
       if (recipientId) {
         this.messageService.sendMessage(recipientId, content);
       }
-
+      this.messageContent.set('');
       // 2️⃣ 再請 Python 回答
       this.messageService.sendOpenAIMessage(content)?.subscribe((message) => {
         // AI 回覆直接 append 到訊息串
       this.messageService.messageThread.update(messages => [...messages, message]);
-      this.messageContent.set('');
       });
     }
     else{
@@ -77,6 +78,11 @@ export class MemberMessages implements OnInit, OnDestroy {
         this.messageEndRef.nativeElement.scrollIntoView({ behavior: 'smooth' });
       }
     })
+  }
+
+   renderMarkdown(mdText: string): SafeHtml {
+    const html = marked.parse(mdText, { async: false }) as string;
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 }
 
