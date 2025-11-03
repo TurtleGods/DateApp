@@ -16,6 +16,11 @@
       @if(memberService.member()?.id==='openai-id'){
         <div class="chat-container">
           <div class="chat-bubble">
+            @if(isTyping===true){
+            <div class="typing-indicator">
+              <span></span><span></span><span></span>
+            </div>
+            }
             <div [innerHTML]="renderMarkdown(message.content)"></div>
           </div>
         </div>

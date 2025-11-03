@@ -8,7 +8,7 @@ import { PresenceService } from '../../../core/services/presence-service';
 import { ActivatedRoute } from '@angular/router';
 import { AccountService } from '../../../core/services/account-service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { marked } from 'marked';
+import { marked, Renderer } from 'marked';
 
 @Component({
   selector: 'app-member-messages',
@@ -24,6 +24,7 @@ export class MemberMessages implements OnInit, OnDestroy {
   private router = inject(ActivatedRoute);
   protected messageContent = model('');
   private sanitizer = inject(DomSanitizer);
+  isTyping = false;
   constructor() {
     effect(() => {
       const currentMessage = this.messageService.messageThread();
@@ -31,6 +32,15 @@ export class MemberMessages implements OnInit, OnDestroy {
         this.scrollToBottom();
       }
     })
+    // ✅ 自訂 Markdown 連結行為
+    const renderer = new Renderer();
+    renderer.link = ({ href, title, tokens }) => {
+      // 直接由 marked.parser() 處理 tokens 內容
+      const text = marked.parser(tokens);
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+    };
+    marked.setOptions({ renderer });
+
   }
   ngOnDestroy(): void {
     this.messageService.stopHubConnection();
@@ -38,9 +48,9 @@ export class MemberMessages implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.router.parent?.paramMap.subscribe({
-      next:params=>{
+      next: params => {
         const otherUserId = params.get('id');
-        if(!otherUserId) throw new Error('Cannot connect to hub');
+        if (!otherUserId) throw new Error('Cannot connect to hub');
         this.messageService.createHubConnection(otherUserId);
       }
     })
@@ -49,9 +59,9 @@ export class MemberMessages implements OnInit, OnDestroy {
 
   sendMessage() {
     const recipientId = this.memberService.member()?.id;
-    console.log('recipientId',recipientId);
-    if (!recipientId||!this.messageContent()) return;
-    else if(recipientId==='openai-id'){
+    console.log('recipientId', recipientId);
+    if (!recipientId || !this.messageContent()) return;
+    else if (recipientId === 'openai-id') {
       const content = this.messageContent();
       // 1️⃣ 使用者訊息先送到 Hub（保持一致）
       if (recipientId) {
@@ -59,15 +69,37 @@ export class MemberMessages implements OnInit, OnDestroy {
       }
       this.messageContent.set('');
       // 2️⃣ 再請 Python 回答
-      this.messageService.sendOpenAIMessage(content)?.subscribe((message) => {
-        // AI 回覆直接 append 到訊息串
-      this.messageService.messageThread.update(messages => [...messages, message]);
+      this.messageService.sendOpenAIMessage(content)?.subscribe(async (message) => {
+        // message.content 為完整回覆
+        const fullText = message.content;
+        const typingMessage = { ...message, content: "" }; // 先插入空訊息
+
+        // 先在 UI 新增一個空訊息泡泡
+        this.messageService.messageThread.update(messages => [...messages, message]);
+
+        // 逐字輸出
+        // this.isTyping = true;
+        // for (let i = 0; i < fullText.length; i++) {
+        //   typingMessage.content += fullText[i];
+        //   // 更新現有 messages 陣列的最後一筆
+        //   this.messageService.messageThread.update(messages => {
+        //     const updated = [...messages];
+        //     updated[updated.length - 1] = { ...typingMessage };
+        //     return updated;
+        //   });
+
+        //   // 每字延遲（30ms）
+        //   await new Promise(res => setTimeout(res, 1));
+        // }
+        // this.isTyping = false;
+
       });
+
     }
-    else{
-    this.messageService.sendMessage(recipientId, this.messageContent())?.then(()=>{
-      this.messageContent.set('');
-    })
+    else {
+      this.messageService.sendMessage(recipientId, this.messageContent())?.then(() => {
+        this.messageContent.set('');
+      })
     }
 
   }
@@ -80,7 +112,7 @@ export class MemberMessages implements OnInit, OnDestroy {
     })
   }
 
-   renderMarkdown(mdText: string): SafeHtml {
+  renderMarkdown(mdText: string): SafeHtml {
     const html = marked.parse(mdText, { async: false }) as string;
     return this.sanitizer.bypassSecurityTrustHtml(html);
   }
